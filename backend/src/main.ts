@@ -1,9 +1,13 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
+import { ValidationExceptionFilter } from './common/filters/validation.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Usar filter customizado para validação
+  app.useGlobalFilters(new ValidationExceptionFilter());
 
   app.useGlobalPipes(
     new ValidationPipe({

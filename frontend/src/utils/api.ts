@@ -12,14 +12,34 @@ class ApiClient {
         'Content-Type': 'application/json',
       },
     });
+
+    // Add request logger
+    this.client.interceptors.request.use((config) => {
+      console.log(`📤 [${config.method?.toUpperCase()}] ${config.url}`, config.data);
+      return config;
+    });
+
+    // Add response logger
+    this.client.interceptors.response.use(
+      (response) => {
+        console.log(`📥 [${response.status}] ${response.config.url}`, response.data);
+        return response;
+      },
+      (error) => {
+        console.error(`❌ [${error.response?.status || 'ERROR'}] ${error.config?.url}`, error.response?.data);
+        return Promise.reject(error);
+      }
+    );
   }
 
   setToken(token: string) {
     this.client.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    console.log('🔑 Token definido');
   }
 
   clearToken() {
     delete this.client.defaults.headers.common['Authorization'];
+    console.log('🔑 Token removido');
   }
 
   // Auth

@@ -23,6 +23,7 @@ export default function LiveCreator({ onLiveCreated }: LiveCreatorProps) {
     setLoading(true);
 
     try {
+      console.log('📺 Criando live com dados:', { title, url, thumbnail, creatorId: user?.id });
       const res = await apiClient.createLive({
         title,
         description,
@@ -30,6 +31,7 @@ export default function LiveCreator({ onLiveCreated }: LiveCreatorProps) {
         thumbnail,
         creatorId: user?.id,
       });
+      console.log('✅ Live criada:', res.data);
       toast.success('Live criada com sucesso!');
       setTitle('');
       setDescription('');
@@ -38,7 +40,24 @@ export default function LiveCreator({ onLiveCreated }: LiveCreatorProps) {
       setIsOpen(false);
       onLiveCreated?.(res.data);
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Erro ao criar live');
+      console.error('❌ Erro ao criar live:', {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
+      
+      let errorMsg = 'Erro ao criar live';
+      if (error.response?.data?.message) {
+        if (Array.isArray(error.response.data.message)) {
+          errorMsg = error.response.data.message[0];
+        } else {
+          errorMsg = error.response.data.message;
+        }
+      } else if (error.message) {
+        errorMsg = error.message;
+      }
+      
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }

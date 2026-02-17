@@ -10,12 +10,13 @@ import HomeContent from '@/components/HomeContent';
 export default function Home() {
   const { isAuthenticated, logout } = useAuthStore();
   const [currentTab, setCurrentTab] = useState('lives');
+  const [isLogin, setIsLogin] = useState(true);
 
   return (
     <main className="min-h-screen bg-gray-900">
       <Toaster position="top-right" />
       {!isAuthenticated() ? (
-        <AuthForm isLogin={true} />
+        <AuthForm isLogin={isLogin} onToggleMode={() => setIsLogin(!isLogin)} />
       ) : (
         <>
           <Navbar onLogout={logout} />

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/store/authStore';
 import { useLiveStore } from '@/store/liveStore';
 import { apiClient } from '@/utils/api';
+import toast from 'react-hot-toast';
 
 interface RoomListProps {
   onRoomSelect: (room: any) => void;
@@ -31,6 +32,20 @@ export default function RoomList({ onRoomSelect }: RoomListProps) {
     }
   };
 
+  const handleDeleteRoom = async (id: string, name: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (window.confirm(`Tem certeza que deseja deletar a sala "${name}"?`)) {
+      try {
+        await apiClient.deleteRoom(id);
+        toast.success('Sala deletada com sucesso!');
+        const updatedRooms = rooms.filter((room) => room.id !== id);
+        setRooms(updatedRooms);
+      } catch (error: any) {
+        toast.error(error.response?.data?.message || 'Erro ao deletar sala');
+      }
+    }
+  };
+
   if (loading) {
     return <div className="text-center text-white">Carregando salas...</div>;
   }
@@ -51,6 +66,12 @@ export default function RoomList({ onRoomSelect }: RoomListProps) {
               <span className="text-blue-400 text-sm">{room.liveIds.length} lives</span>
               <span className="text-green-400 text-sm">👥 {room.viewers}</span>
             </div>
+            <button
+              onClick={(e) => handleDeleteRoom(room.id, room.name, e)}
+              className="mt-3 w-full bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-xs transition"
+            >
+              🗑️ Deletar Sala
+            </button>
           </div>
         ))}
       </div>

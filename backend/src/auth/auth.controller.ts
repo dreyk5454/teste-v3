@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
@@ -9,11 +9,15 @@ export class AuthController {
 
   @Post('register')
   async register(@Body() registerDto: RegisterDto) {
-    return this.authService.register(
-      registerDto.email,
-      registerDto.username,
-      registerDto.password,
-    );
+    try {
+      return await this.authService.register(
+        registerDto.email,
+        registerDto.username,
+        registerDto.password,
+      );
+    } catch (error: any) {
+      throw new BadRequestException(error.message || 'Erro ao registrar usuário');
+    }
   }
 
   @Post('login')
@@ -23,7 +27,7 @@ export class AuthController {
       loginDto.password,
     );
     if (!user) {
-      throw new Error('Invalid credentials');
+      throw new UnauthorizedException('Email ou senha inválidos');
     }
     return this.authService.login(user);
   }

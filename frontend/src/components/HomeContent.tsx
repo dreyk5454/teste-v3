@@ -18,6 +18,7 @@ interface HomeContentProps {
 export default function HomeContent({ onTabChange, currentTab = 'lives' }: HomeContentProps) {
   const { lives, selectedRoom, addLiveToRoom, setRooms } = useLiveStore();
   const [activeTab, setActiveTab] = useState(currentTab);
+  const [refreshLives, setRefreshLives] = useState(0);
 
   const handleRoomSelect = (room: any) => {
     useLiveStore.setState({ selectedRoom: room });
@@ -44,7 +45,25 @@ export default function HomeContent({ onTabChange, currentTab = 'lives' }: HomeC
   };
 
   const handleLiveCreated = (live: any) => {
-    useLiveStore.setState({ lives: [...lives, live] });
+    console.log('🎬 handleLiveCreated chamado com:', live);
+    const currentState = useLiveStore.getState();
+    console.log('📊 Estado atual antes:', { livesCount: currentState.lives.length });
+    
+    const updatedLives = [...currentState.lives, live];
+    
+    useLiveStore.setState({ lives: updatedLives });
+    console.log('📊 Estado atualizado após setState:', { livesCount: updatedLives.length });
+    
+    // Force refresh da lista de lives
+    setRefreshLives(prev => {
+      const newValue = prev + 1;
+      console.log(`🔄 Refresh trigger incrementado: ${prev} → ${newValue}`);
+      return newValue;
+    });
+    
+    // Muda automaticamente para aba de Lives
+    setActiveTab('lives');
+    
     toast.success('Live criada com sucesso!');
   };
 
@@ -99,7 +118,7 @@ export default function HomeContent({ onTabChange, currentTab = 'lives' }: HomeC
       </div>
 
       <div className="mt-8">
-        {activeTab === 'lives' && <LiveList onLiveSelect={handleLiveSelect} />}
+        {activeTab === 'lives' && <LiveList onLiveSelect={handleLiveSelect} refreshTrigger={refreshLives} />}
         {activeTab === 'rooms' && <RoomList onRoomSelect={handleRoomSelect} />}
         {activeTab === 'player' && selectedRoom && (
           <div className="space-y-6">

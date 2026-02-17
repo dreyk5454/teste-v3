@@ -17,36 +17,8 @@ import { JwtGuard } from '../auth/jwt.guard';
 export class LivesController {
   constructor(private readonly livesService: LivesService) {}
 
-  // Lives Endpoints
-  @Post()
-  @UseGuards(JwtGuard)
-  createLive(@Body() createLiveDto: CreateLiveDto) {
-    return this.livesService.createLive(createLiveDto);
-  }
-
-  @Get()
-  findAllLives() {
-    return this.livesService.findAllLives();
-  }
-
-  @Get(':id')
-  findLiveById(@Param('id') id: string) {
-    return this.livesService.findLiveById(id);
-  }
-
-  @Put(':id')
-  @UseGuards(JwtGuard)
-  updateLive(@Param('id') id: string, @Body() updates: Partial<any>) {
-    return this.livesService.updateLive(id, updates);
-  }
-
-  @Delete(':id')
-  @UseGuards(JwtGuard)
-  deleteLive(@Param('id') id: string) {
-    return this.livesService.deleteLive(id);
-  }
-
-  // Rooms Endpoints
+  // IMPORTANTE: Rotas mais específicas ANTES de rotas genéricas
+  // Rooms Endpoints PRIMEIRO (porque são mais específicas)
   @Post('rooms')
   @UseGuards(JwtGuard)
   createRoom(@Body() createRoomDto: CreateRoomDto) {
@@ -85,5 +57,34 @@ export class LivesController {
   @UseGuards(JwtGuard)
   deleteRoom(@Param('id') id: string) {
     return this.livesService.deleteRoom(id);
+  }
+
+  // Lives Endpoints DEPOIS (porque são menos específicas)
+  @Post()
+  @UseGuards(JwtGuard)
+  createLive(@Body() createLiveDto: CreateLiveDto) {
+    return this.livesService.createLive(createLiveDto);
+  }
+
+  @Get()
+  findAllLives() {
+    return this.livesService.findAllLives();
+  }
+
+  @Get(':id')
+  findLiveById(@Param('id') id: string) {
+    return this.livesService.findLiveById(id);
+  }
+
+  @Put(':id')
+  @UseGuards(JwtGuard)
+  updateLive(@Param('id') id: string, @Body() updates: Partial<any>) {
+    return this.livesService.updateLive(id, updates);
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtGuard)
+  deleteLive(@Param('id') id: string) {
+    return this.livesService.deleteLive(id);
   }
 }
